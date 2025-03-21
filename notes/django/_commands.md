@@ -1,0 +1,2 @@
+-   `python manage.py migrate`: Run all pending migrations across all Django apps in the project that haven't been applied yet.
+-   `python manage.py migrate {app}`: Run migrations for a specific app(`{app}`) only.

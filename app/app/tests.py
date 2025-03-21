@@ -2,6 +2,7 @@ from django.test import SimpleTestCase
 
 from app import calc
 
+
 # SimpleTestCase: No DB interaction
 # TestCase: DB interaction
 class CalcTests(SimpleTestCase):

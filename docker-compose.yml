@@ -21,7 +21,7 @@ services:
         depends_on:
             db:
             # NOTE:
-            # service_healthy is a default value that Docker Compose provides. 
+            # service_healthy is a default value that Docker Compose provides.
             # Other possible condition values include:
             # service_started (just wait for the container to start)
             # service_completed_successfully (for services that are expected to exit)
@@ -36,7 +36,7 @@ services:
             - POSTGRES_USER=demouser
             - POSTGRES_PASSWORD=demopwd
         healthcheck:
-            # NOTE: "CMD-SHELL" tells Docker to run the command using the container's shell.  
+            # NOTE: "CMD-SHELL" tells Docker to run the command using the container's shell.
             # "pg_isready" PostgreSQL utility tool that checks if the PostgreSQL server is accepting connections.
             test: ["CMD-SHELL", "pg_isready -U demouser -d demodb"]
             interval: 5s

@@ -1,3 +1,6 @@
 -   `docker-compose up`: Builds (if needed), creates, and starts all services/containers specified in docker-compose.yml
 -   `docker compose run --rm app sh`: Creates a new, temporary container for the "app" service and runs the shell command in it; removes the container after exit the shell
 -   `docker compose exec app sh`: Executes a command (in this case, a shell) in an already running "app" container
+-   `docker volume`:
+    -   `ls`: Show list
+    -   `rm {smth}` Remove some volume

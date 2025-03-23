@@ -17,7 +17,11 @@ class UserManager(BaseUserManager):
     ):
         """Create, save and return a new user."""
         user = self.model(
-            email=email, name=name, is_active=is_active, is_staff=is_staff
+            # NOTE: normalize_email is a method of BaseUserManager
+            email=self.normalize_email(email),
+            name=name,
+            is_active=is_active,
+            is_staff=is_staff,
         )
         user.set_password(password)
         user.save(using=self._db)

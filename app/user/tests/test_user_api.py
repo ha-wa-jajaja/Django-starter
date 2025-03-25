@@ -9,10 +9,10 @@ from rest_framework.test import APIClient
 from rest_framework import status
 
 # DOC: https://docs.djangoproject.com/en/5.1/ref/urlresolvers/#reverse
-# TODO: Read https://claude.ai/share/0d5d02ed-31c0-4eb5-b380-3043d24b4124
-# And have better understanding
+
 # NOTE: In this case: {app}:{endpoint}
 CREATE_USER_URL = reverse('user:create')
+TOKEN_URL = reverse('user:token')
 
 
 def create_user(**params):

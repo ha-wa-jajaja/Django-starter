@@ -1,11 +1,12 @@
 """
 Views for the user API.
 """
-from rest_framework import generics
+
+from rest_framework import authentication, generics, permissions
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.settings import api_settings
+from user.serializers import AuthTokenSerializer, UserSerializer
 
-from user.serializers import (UserSerializer, AuthTokenSerializer)
 
 # NOTE: generics.CreateAPIView is Django REST Framework specified POST request handler.
 class CreateUserView(generics.CreateAPIView):
@@ -19,15 +20,30 @@ class CreateUserView(generics.CreateAPIView):
     # 5. Finally, the view returns an appropriate response
     serializer_class = UserSerializer
 
+
 # NOTE: ObtainAuthToken is a built-in view in Django REST Framework
 # That accepts POST requests to allow users to obtain an authentication token by submitting their username and password.
 # DOC: https://www.django-rest-framework.org/api-guide/authentication/
 class CreateTokenView(ObtainAuthToken):
     """Create a new auth token for user."""
 
-    # NOTE: post() of ObtainAuthToken runs serializer.is_valid(), and it runs validate() inside 
+    # NOTE: post() of ObtainAuthToken runs serializer.is_valid(), and it runs validate() inside
     serializer_class = AuthTokenSerializer
-    
-    # NOTE: This is a setting within DRF that specifies the default renderer classes that DRF should use 
+
+    # NOTE: This is a setting within DRF that specifies the default renderer classes that DRF should use
     # if not otherwise specified in a view. By default, it usually includes JSONRenderer.
     renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
+
+
+class ManageUserView(generics.RetrieveUpdateAPIView):
+    """Manage the authenticated user."""
+
+    # NOTE: serializers are to handle interaction with the DB model
+    serializer_class = UserSerializer
+    authentication_classes = [authentication.TokenAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+
+    # get_object() is a method defined within generics.RetrieveUpdateAPIView
+    def get_object(self):
+        """Retrieve and return the authenticated user."""
+        return self.request.user

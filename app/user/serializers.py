@@ -9,6 +9,7 @@ from rest_framework import serializers
 # NOTE: This serializer works in both directions:
 # 1. From Python to JSON: Serializes the data for the response
 # 2. From JSON to Python: Deserializes the data for the request
+
 class UserSerializer(serializers.ModelSerializer):
     """Serializer for the user object."""
 
@@ -20,6 +21,8 @@ class UserSerializer(serializers.ModelSerializer):
         # NOTE: extra_kwargs provides additional configuration options for fields that are defined in the fields attribute.
         extra_kwargs = {'password': {'write_only': True, 'min_length': 5}}
 
+    # The ModelSerializer already has a built-in create method,
+    # but we override it here to handle the password hashing.
     def create(self, validated_data: Dict[str, Any]):
         """Create and return a user with encrypted password."""
 

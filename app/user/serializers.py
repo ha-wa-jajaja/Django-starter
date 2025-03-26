@@ -4,7 +4,7 @@ Serializers for the user API View.
 
 from typing import Any, Dict
 
-from django.contrib.auth import authenticate, get_user_model
+from django.contrib.auth import get_user_model
 from django.utils.translation import gettext as _
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
@@ -62,51 +62,22 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 
-class AuthTokenSerializer(serializers.Serializer):
-    """Serializer for the user auth token."""
-
-    # NOTE: These two lines declares what data AuthTokenSerializer should expect when receives a request.
-    email = serializers.EmailField()
-    password = serializers.CharField(
-        style={"input_type": "password"},
-        trim_whitespace=False,
-    )
-
-    def validate(self, attrs):
-        """Validate and authenticate the user."""
-
-        email = attrs.get("email")
-        password = attrs.get("password")
-
-        # NOTE: authenticate() is to verify a user's credentials
-        # And returns the corresponding User object or None(if no user matches)
-        user = authenticate(
-            # NOTE: self.context is a dictionary that is made available to a serializer's methods
-            #  during the serialization/deserialization process.
-            # NOTE:Even if a simple username/password check doesn't need the request,
-            # including it maintains consistency in how authenticate() is called across different scenarios
-            request=self.context.get("request"),
-            username=email,
-            password=password,
-        )
-        if not user:
-            msg = _("Unable to authenticate with provided credentials.")
-            raise serializers.ValidationError(msg, code="authorization")
-
-        return {"user": user}
-
-        # NOTE: Course return attrs, but not needed
-        # attrs['user'] = user
-        # return attrs
-
-
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     """Custom token serializer to include user info in response"""
 
     # Calls validate first, and get token
     def validate(self, attrs):
         data = super().validate(attrs)
+
         # Add additional user profile data only needed at login
+        # Will be returned with the token response
+        # In this case:
+        # {
+        #   refresh: string
+        #   access: string
+        #   name: string
+        #   email: string
+        # }
         data["name"] = self.user.name
         data["email"] = self.user.email
         return data

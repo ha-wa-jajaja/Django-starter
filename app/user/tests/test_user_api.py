@@ -12,7 +12,6 @@ from rest_framework.test import APIClient
 
 # NOTE: In this case: {app}:{endpoint}
 CREATE_USER_URL = reverse("user:create")
-TOKEN_URL = reverse("user:token")
 ME_URL = reverse("user:me")
 
 

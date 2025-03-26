@@ -15,6 +15,5 @@ urlpatterns = [
     # 2. Generate URLs in views using reverse('user:create')
     # 3. Create links in app without hardcoding URLs
     path("create/", views.CreateUserView.as_view(), name="create"),
-    path("token/", views.CreateTokenView.as_view(), name="token"),
     path("me/", views.ManageUserView.as_view(), name="me"),
 ]

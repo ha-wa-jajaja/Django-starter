@@ -7,6 +7,7 @@ from typing import Any, Dict
 from django.contrib.auth import authenticate, get_user_model
 from django.utils.translation import gettext as _
 from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 # NOTE: This serializer works in both directions:
 # 1. From Python to JSON: Serializes the data for the response
@@ -97,3 +98,23 @@ class AuthTokenSerializer(serializers.Serializer):
         # NOTE: Course return attrs, but not needed
         # attrs['user'] = user
         # return attrs
+
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    """Custom token serializer to include user info in response"""
+
+    # Calls validate first, and get token
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        # Add additional user profile data only needed at login
+        data["name"] = self.user.name
+        data["email"] = self.user.email
+        return data
+
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        # Add essential data needed throughout the session to encode in the token
+        token["user_id"] = user.id
+        token["is_staff"] = user.is_staff  # Useful for permission checks
+        return token

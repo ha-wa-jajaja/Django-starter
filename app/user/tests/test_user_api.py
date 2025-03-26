@@ -77,7 +77,16 @@ class PrivateUserApiTests(TestCase):
             name="Test Name",
         )
         self.client = APIClient()
-        self.client.force_authenticate(user=self.user)
+
+        # Get JWT tokens
+        res = self.client.post(
+            reverse("token_obtain_pair"),
+            {"email": "test@example.com", "password": "testpass123"},
+        )
+        self.token = res.data["access"]
+
+        # Authenticate with JWT
+        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {self.token}")
 
     def test_retrieve_profile_success(self):
         """Test retrieving profile for logged in user."""

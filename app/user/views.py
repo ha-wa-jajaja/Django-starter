@@ -6,7 +6,12 @@ from rest_framework import generics, permissions
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.settings import api_settings
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from user.serializers import AuthTokenSerializer, UserSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
+from user.serializers import (
+    AuthTokenSerializer,
+    CustomTokenObtainPairSerializer,
+    UserSerializer,
+)
 
 
 # NOTE: generics.CreateAPIView is Django REST Framework specified POST request handler.
@@ -48,3 +53,9 @@ class ManageUserView(generics.RetrieveUpdateAPIView):
     def get_object(self):
         """Retrieve and return the authenticated user."""
         return self.request.user
+
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    """Custom token view using our serializer"""
+
+    serializer_class = CustomTokenObtainPairSerializer

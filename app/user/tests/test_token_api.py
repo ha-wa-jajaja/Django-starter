@@ -4,8 +4,8 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 
-CREATE_USER_URL = reverse("user:create")
-TOKEN_URL = reverse("user:token")
+TOKEN_URL = reverse("token_obtain_pair")
+TOKEN_REFRESH_URL = reverse("token_refresh")
 
 
 def create_user(**params):
@@ -13,8 +13,8 @@ def create_user(**params):
     return get_user_model().objects.create_user(**params)
 
 
-class PublicUserApiTests(TestCase):
-    """Test the public features of Token API"""
+class JWTAuthApiTests(TestCase):
+    """Test JWT auth features"""
 
     def setUp(self):
         self.client = APIClient()
@@ -34,7 +34,8 @@ class PublicUserApiTests(TestCase):
         }
         res = self.client.post(TOKEN_URL, payload)
 
-        self.assertIn("token", res.data)
+        self.assertIn("access", res.data)
+        self.assertIn("refresh", res.data)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
     def test_create_token_bad_credentials(self):
@@ -44,21 +45,46 @@ class PublicUserApiTests(TestCase):
         payload = {"email": "test@example.com", "password": "badpass"}
         res = self.client.post(TOKEN_URL, payload)
 
-        self.assertNotIn("token", res.data)
-        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertNotIn("access", res.data)
+        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_create_token_email_not_found(self):
         """Test error returned if user not found for given email."""
         payload = {"email": "test@example.com", "password": "pass123"}
         res = self.client.post(TOKEN_URL, payload)
 
-        self.assertNotIn("token", res.data)
-        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertNotIn("access", res.data)
+        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_create_token_blank_password(self):
         """Test posting a blank password returns an error."""
         payload = {"email": "test@example.com", "password": ""}
         res = self.client.post(TOKEN_URL, payload)
 
-        self.assertNotIn("token", res.data)
+        self.assertNotIn("access", res.data)
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_refresh_token(self):
+        """Test refresh token endpoint."""
+        user_details = {
+            "name": "Test Name",
+            "email": "test@example.com",
+            "password": "test-user-password123",
+        }
+        create_user(**user_details)
+
+        # First get tokens
+        auth_res = self.client.post(
+            TOKEN_URL,
+            {
+                "email": user_details["email"],
+                "password": user_details["password"],
+            },
+        )
+        refresh_token = auth_res.data["refresh"]
+
+        # Test refresh endpoint
+        res = self.client.post(TOKEN_REFRESH_URL, {"refresh": refresh_token})
+
+        self.assertIn("access", res.data)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)

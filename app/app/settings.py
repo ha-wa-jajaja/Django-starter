@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 import os
+from datetime import timedelta
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -26,7 +27,7 @@ SECRET_KEY = "django-insecure-rnlxy*yk0t(4u-#u&1xa@nmfx^@=)c%a7jp8m^&=byu_+1e*&o
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['0.0.0.0']
+ALLOWED_HOSTS = ["0.0.0.0"]
 
 
 # Application definition
@@ -39,10 +40,10 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "core",
-    'rest_framework',
-    'rest_framework.authtoken',
-    'drf_spectacular',
-    'user',
+    "rest_framework",
+    "rest_framework.authtoken",
+    "drf_spectacular",
+    "user",
 ]
 
 MIDDLEWARE = [
@@ -136,5 +137,32 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 AUTH_USER_MODEL = "core.User"
 
 REST_FRAMEWORK = {
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ],
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    # Whether to create a new refresh token when refreshing an access token
+    "ROTATE_REFRESH_TOKENS": False,
+    # Whether to blacklist old refresh tokens when a new one is created
+    # If True, requires rest_framework_simplejwt.token_blacklist
+    "BLACKLIST_AFTER_ROTATION": False,
+    "ALGORITHM": "HS256",  # Algorithm used to sign the token
+    "SIGNING_KEY": SECRET_KEY,  # Key used to sign the token
+    "VERIFYING_KEY": None,  # Key used to verify the token signature
+    "AUDIENCE": None,  # Audience claim (optional)
+    "ISSUER": None,  # Issuer claim (optional)
+    # The type prefix in the Authorization header
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    # The name of the header containing the token
+    "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
+    # The field in the user model that's used as the JWT subject
+    "USER_ID_FIELD": "id",
+    # The claim in the token that contains the user ID
+    "USER_ID_CLAIM": "user_id",
 }

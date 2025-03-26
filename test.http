@@ -1,0 +1,8 @@
+###
+POST http://0.0.0.0:8000/api/token/ HTTP/1.1
+Content-Type: application/json
+
+{
+	"email": "a0930710766@gmail.com",
+	"password": "0930710766"
+}

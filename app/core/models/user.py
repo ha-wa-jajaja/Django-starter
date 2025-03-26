@@ -17,7 +17,7 @@ class UserManager(BaseUserManager):
     ):
         """Create, save and return a new user."""
         if not email:
-            raise ValueError('User must have an email address.')
+            raise ValueError("User must have an email address.")
 
         user = self.model(
             # NOTE: normalize_email is a method of BaseUserManager

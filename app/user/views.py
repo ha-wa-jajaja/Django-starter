@@ -2,9 +2,10 @@
 Views for the user API.
 """
 
-from rest_framework import authentication, generics, permissions
+from rest_framework import generics, permissions
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.settings import api_settings
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from user.serializers import AuthTokenSerializer, UserSerializer
 
 
@@ -40,7 +41,7 @@ class ManageUserView(generics.RetrieveUpdateAPIView):
 
     # NOTE: serializers are to handle interaction with the DB model
     serializer_class = UserSerializer
-    authentication_classes = [authentication.TokenAuthentication]
+    authentication_classes = [JWTAuthentication]
     permission_classes = [permissions.IsAuthenticated]
 
     # get_object() is a method defined within generics.RetrieveUpdateAPIView

@@ -1,3 +1,3 @@
 # TODO
 
--   Create frontend that interacts with the endpoints
+-   Admin Login & User login

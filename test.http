@@ -6,3 +6,13 @@ Content-Type: application/json
 	"email": "a0930710766@gmail.com",
 	"password": "0930710766"
 }
+
+###
+GET http://localhost:8000/api/user/admin/list/ HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQzMDY4ODgxLCJpYXQiOjE3NDMwNjUyODEsImp0aSI6IjY4YmVhMzdmNjIwMTQxYTk5MTZlZDBlMzFjZDVjODc0IiwidXNlcl9pZCI6MSwiaXNfc3RhZmYiOnRydWV9.VU3Ap0EbHGx3zIwjmfcwANkHHTBdAXFmIt61uE1fqE0
+
+{
+	"email": "a0930710766@gmail.com",
+	"password": "0930710766"
+}

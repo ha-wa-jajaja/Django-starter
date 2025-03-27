@@ -62,7 +62,7 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 
-class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+class UserTokenObtainPairSerializer(TokenObtainPairSerializer):
     """Custom token serializer to include user info in response"""
 
     # Calls validate first, and get token

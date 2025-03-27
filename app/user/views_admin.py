@@ -1,7 +1,8 @@
 from django.contrib.auth import get_user_model
 from rest_framework import generics, permissions
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from user.serializers_admin import AdminUserSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
+from user.serializers_admin import AdminUserSerializer, AdminTokenObtainPairSerializer
 
 
 class AdminListUsersView(generics.ListAPIView):
@@ -29,3 +30,8 @@ class AdminUserDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     # The lookup field is 'id' by default, but explicitly specify
     lookup_field = "pk"  # primary key, which is the 'id'
+
+class AdminTokenObtainPairView(TokenObtainPairView):
+    """Custom token view using our serializer"""
+
+    serializer_class = AdminTokenObtainPairSerializer

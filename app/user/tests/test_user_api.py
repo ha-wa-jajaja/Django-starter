@@ -79,7 +79,7 @@ class PrivateUserApiTests(TestCase):
 
         # Get JWT tokens
         res = self.client.post(
-            reverse("token_obtain_pair"),
+            reverse("user_login"),
             {"email": "test@example.com", "password": "testpass123"},
         )
         self.token = res.data["access"]

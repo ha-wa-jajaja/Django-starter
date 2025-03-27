@@ -22,7 +22,8 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
     TokenVerifyView,
 )
-from user.views import CustomTokenObtainPairView
+from user.views import UserTokenObtainPairView
+from user.views_admin import AdminTokenObtainPairView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -33,8 +34,9 @@ urlpatterns = [
         name="api-docs",
     ),
     path("api/user/", include("user.urls")),
-    # JWT
-    path("api/token/", CustomTokenObtainPairView.as_view(), name="token_obtain_pair"),
+    # JWT AUTH
+    path("api/login", UserTokenObtainPairView.as_view(), name="user_login"),
+    path("api/login/admin", AdminTokenObtainPairView.as_view(), name="admin_login"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("api/token/verify/", TokenVerifyView.as_view(), name="token_verify"),
 ]

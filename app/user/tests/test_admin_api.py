@@ -9,7 +9,7 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 USERS_LIST_URL = reverse("user:admin_user_list")
-TOKEN_URL = reverse("token_obtain_pair")
+TOKEN_URL = reverse("user_login")
 
 
 def create_user(**params):

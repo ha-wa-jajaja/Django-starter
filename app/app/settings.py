@@ -44,9 +44,11 @@ INSTALLED_APPS = [
     "rest_framework.authtoken",
     "drf_spectacular",
     "user",
+    "corsheaders",
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",  # Add this line at the top
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -57,6 +59,16 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = "app.urls"
+
+# CORS settings
+CORS_ALLOW_ALL_ORIGINS = True  # For development only
+# For production, specify allowed origins:
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:3000",
+#     "https://your-production-frontend-domain.com",
+# ]
+
+CORS_ALLOW_CREDENTIALS = True
 
 TEMPLATES = [
     {

@@ -15,3 +15,17 @@ class AdminListUsersView(generics.ListAPIView):
     permission_classes = [permissions.IsAdminUser]
 
     queryset = get_user_model().objects.all()
+
+
+class AdminUserDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """Retrieve or update a specific user - admin only endpoint."""
+
+    serializer_class = AdminUserSerializer
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [permissions.IsAdminUser]
+
+    # Get the User model that's defined in settings.AUTH_USER_MODEL
+    queryset = get_user_model().objects.all()
+
+    # The lookup field is 'id' by default, but explicitly specify
+    lookup_field = "pk"  # primary key, which is the 'id'

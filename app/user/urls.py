@@ -20,4 +20,14 @@ urlpatterns = [
     path(
         "admin/list/", views_admin.AdminListUsersView.as_view(), name="admin_user_list"
     ),
+    path(
+        # NOTE: In Django the angle brackets <> are used to capture parts of the URL as parameters
+        # Here:
+        # 1. Captures a numeric value from the URL
+        # 2. Converts it to an integer
+        # 3. Passes it to the view as a parameter named "pk" (primary key)
+        "admin/user/<int:pk>/",
+        views_admin.AdminUserDetailView.as_view(),
+        name="admin_user_detail",
+    ),
 ]

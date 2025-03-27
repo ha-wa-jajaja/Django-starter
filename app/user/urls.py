@@ -3,7 +3,7 @@ URL mappings for the user API.
 """
 
 from django.urls import path
-from user import views
+from user import views, views_admin
 
 app_name = "user"
 
@@ -16,4 +16,8 @@ urlpatterns = [
     # 3. Create links in app without hardcoding URLs
     path("create/", views.CreateUserView.as_view(), name="create"),
     path("me/", views.ManageUserView.as_view(), name="me"),
+    # Admin only endpoints
+    path(
+        "admin/list/", views_admin.AdminListUsersView.as_view(), name="admin_user_list"
+    ),
 ]

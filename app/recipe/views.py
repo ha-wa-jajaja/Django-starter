@@ -38,3 +38,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return serializers.RecipeSerializer
 
         return self.serializer_class
+
+    # NOTE: perform_create method is called during the POST processing flow in DRF;
+    # Runs after data validation and before saving the data to the database.
+
+    # NOTE: This pattern is common in DRF when creating resources that belong to users:
+    # doesn't accept a user field from clients, but instead assigns the user field
+    # to the authenticated user that made the request.
+    def perform_create(self, serializer):
+        """Create a new recipe."""
+        serializer.save(user=self.request.user)

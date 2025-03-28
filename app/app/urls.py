@@ -17,11 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
-    TokenVerifyView,
-)
+from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
 from user.views import UserTokenObtainPairView
 from user.views_admin import AdminTokenObtainPairView
 
@@ -33,10 +29,12 @@ urlpatterns = [
         SpectacularSwaggerView.as_view(url_name="api-schema"),
         name="api-docs",
     ),
-    path("api/user/", include("user.urls")),
     # JWT AUTH
     path("api/login", UserTokenObtainPairView.as_view(), name="user_login"),
     path("api/login/admin", AdminTokenObtainPairView.as_view(), name="admin_login"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("api/token/verify/", TokenVerifyView.as_view(), name="token_verify"),
+    # APPS
+    path("api/user/", include("user.urls")),
+    path("api/recipe/", include("recipe.urls")),
 ]

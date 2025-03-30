@@ -10,6 +10,7 @@ from tags.serializers import TagSerializer
 #   - Using mixins to provide only the desired actions
 #   - Using a custom queryset to filter the tags to the authenticated user
 class TagViewSet(
+    mixins.CreateModelMixin,
     mixins.DestroyModelMixin,
     mixins.UpdateModelMixin,
     mixins.ListModelMixin,
@@ -27,3 +28,7 @@ class TagViewSet(
     def get_queryset(self):
         """Filter queryset to authenticated user."""
         return self.queryset.filter(user=self.request.user).order_by("-name")
+    
+    def perform_create(self, serializer):
+        """Create a new tag."""
+        serializer.save(user=self.request.user)

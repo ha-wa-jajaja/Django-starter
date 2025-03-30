@@ -8,6 +8,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 from recipe.models import Recipe
+from tags.models import Tag
 from recipe.serializers import RecipeDetailSerializer, RecipeSerializer
 from rest_framework import status
 from rest_framework.test import APIClient
@@ -189,3 +190,44 @@ class PrivateRecipeApiTests(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
         self.assertTrue(Recipe.objects.filter(id=recipe.id).exists())
+
+    def test_create_recipe_with_existing_tags(self):
+        """Test creating a recipe with existing tag."""
+        tag_indian = Tag.objects.create(user=self.user, name='Indian')
+        tag_breakfast = Tag.objects.create(user=self.user, name='Breakfast')
+        
+        payload = {
+            'title': 'Pongal',
+            'time_minutes': 60,
+            'price': Decimal('4.50'),
+            'tags': [tag_indian.id, tag_breakfast.id],
+        }
+        
+        res = self.client.post(RECIPES_URL, payload, format='json')
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        recipes = Recipe.objects.filter(user=self.user)
+        self.assertEqual(recipes.count(), 1)
+        recipe = recipes[0]
+        self.assertEqual(recipe.tags.count(), 2)
+        self.assertIn(tag_indian, recipe.tags.all())
+        self.assertIn(tag_breakfast, recipe.tags.all())
+
+    def test_create_recipe_fail_with_not_existing_tag(self):
+        """Test creating a recipe with a non-existent tag ID fails."""
+        # Assuming no tag with ID 999999 exists in the database
+        non_existent_tag_id = 999999
+        
+        payload = {
+            'title': 'Thai Curry',
+            'time_minutes': 30,
+            'price': Decimal('5.25'),
+            'tags': [non_existent_tag_id],
+        }
+        
+        res = self.client.post(RECIPES_URL, payload, format='json')
+        
+        # Should return 400 Bad Request since the tag doesn't exist
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        
+        # Verify no recipe was created
+        self.assertEqual(Recipe.objects.filter(user=self.user).count(), 0)

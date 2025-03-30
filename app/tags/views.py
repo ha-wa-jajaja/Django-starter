@@ -5,7 +5,10 @@ from tags.models import Tag
 from tags.serializers import TagSerializer
 
 
-# NOTE: The mixins.ListModelMixin provides the listing functionality
+# NOTE: The approach customizes the accessibility, by:
+#   - Using a GenericViewSet instead of ModelViewSet
+#   - Using mixins to provide only the desired actions( UpdateModelMixin for update and ListModelMixin for list)
+#   - Using a custom queryset to filter the tags to the authenticated user
 class TagViewSet(
     mixins.UpdateModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet
 ):

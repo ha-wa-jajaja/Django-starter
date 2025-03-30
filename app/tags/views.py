@@ -7,10 +7,13 @@ from tags.serializers import TagSerializer
 
 # NOTE: The approach customizes the accessibility, by:
 #   - Using a GenericViewSet instead of ModelViewSet
-#   - Using mixins to provide only the desired actions( UpdateModelMixin for update and ListModelMixin for list)
+#   - Using mixins to provide only the desired actions
 #   - Using a custom queryset to filter the tags to the authenticated user
 class TagViewSet(
-    mixins.UpdateModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet
+    mixins.DestroyModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.ListModelMixin,
+    viewsets.GenericViewSet,
 ):
     """Manage tags in the database."""
 

@@ -6,7 +6,9 @@ from tags.serializers import TagSerializer
 
 
 # NOTE: The mixins.ListModelMixin provides the listing functionality
-class TagViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+class TagViewSet(
+    mixins.UpdateModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet
+):
     """Manage tags in the database."""
 
     serializer_class = TagSerializer

@@ -44,6 +44,19 @@ class PrivateIngredientsApiTests(TestCase):
         self.client = APIClient()
         self.client.force_authenticate(self.user)
 
+    def test_create_ingredient(self):
+        """Test creating an ingredient."""
+        payload = {"name": "Cabbage"}
+        res = self.client.post(INGREDIENTS_URL, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        ingredient = Ingredient.objects.get(id=res.data["id"])
+        for key in payload:
+            self.assertEqual(payload[key], getattr(ingredient, key))
+        self.assertEqual(ingredient.user, self.user)
+        self.assertEqual(ingredient.name, payload["name"])
+        self.assertEqual(res.data["name"], payload["name"])
+
     def test_retrieve_ingredients(self):
         """Test retrieving a list of ingredients."""
         Ingredient.objects.create(user=self.user, name="Kale")
@@ -81,7 +94,7 @@ class PrivateIngredientsApiTests(TestCase):
         ingredient.refresh_from_db()
         self.assertEqual(ingredient.name, payload["name"])
 
-    def test_delete_tag(self):
+    def test_delete_ingredient(self):
         """Test deleting a tag."""
         ingredient = Ingredient.objects.create(user=self.user, name="Garlic")
 

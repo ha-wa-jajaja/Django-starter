@@ -4,8 +4,6 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from tags.models import Tag
 
-# Create your tests here.
-
 
 class RecipeTests(TestCase):
     def test_create_tag(self):

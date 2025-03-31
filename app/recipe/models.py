@@ -26,6 +26,7 @@ class Recipe(models.Model):
         # 4.Support for Lazy Loading
         "tags.Tag",
     )
+    ingredients = models.ManyToManyField("ingredient.Ingredient")
 
     def __str__(self):
         return self.title

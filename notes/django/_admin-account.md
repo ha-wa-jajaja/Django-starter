@@ -9,3 +9,10 @@ a0930710766@gmail.com
 
 test-user@user.com
 user5678
+
+```json
+{
+    "email": "test-user@user.com",
+    "password": "user5678"
+}
+```

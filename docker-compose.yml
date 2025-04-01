@@ -21,11 +21,11 @@ services:
             - DB_PASS=demopwd
         depends_on:
             db:
-            # NOTE:
-            # service_healthy is a default value that Docker Compose provides.
-            # Other possible condition values include:
-            # service_started (just wait for the container to start)
-            # service_completed_successfully (for services that are expected to exit)
+                # NOTE:
+                # service_healthy is a default value that Docker Compose provides.
+                # Other possible condition values include:
+                # service_started (just wait for the container to start)
+                # service_completed_successfully (for services that are expected to exit)
                 condition: service_healthy
 
     db:
@@ -43,20 +43,6 @@ services:
             interval: 5s
             timeout: 5s
             retries: 5
-
-    frontend:
-        build:
-            context: ./frontend
-        ports:
-            - "3000:3000"
-        volumes:
-            - ./frontend:/frontend
-            - /frontend/node_modules
-        environment:
-            - NEXT_PUBLIC_API_URL=http://localhost:8000/api
-            - NODE_ENV=development
-        depends_on:
-            - app
 
 volumes:
     dev-db-data:

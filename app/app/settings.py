@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "recipe",
     "tags",
     "ingredient",
+    "bugbytes"
 ]
 
 MIDDLEWARE = [

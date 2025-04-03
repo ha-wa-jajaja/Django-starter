@@ -20,6 +20,8 @@ services:
             - DB_USER=demouser
             - DB_PASS=demopwd
         depends_on:
+            redis:
+                condition: service_started
             db:
                 # NOTE:
                 # service_healthy is a default value that Docker Compose provides.
@@ -27,6 +29,8 @@ services:
                 # service_started (just wait for the container to start)
                 # service_completed_successfully (for services that are expected to exit)
                 condition: service_healthy
+
+
 
     db:
         image: postgres:13-alpine
@@ -43,6 +47,33 @@ services:
             interval: 5s
             timeout: 5s
             retries: 5
+
+    redis:
+        image: redis:7.0.11-alpine
+        ports:
+            - "6379:6379"
+
+    celery:
+        build:
+            context: .
+            args:
+                - DEV=true
+        volumes:
+            - ./app:/app
+        command: >
+            sh -c "python manage.py celery worker --loglevel=info"
+        environment:
+            - DB_HOST=db
+            - DB_NAME=demodb
+            - DB_USER=demouser
+            - DB_PASS=demopwd
+        depends_on:
+            redis:
+                condition: service_started
+            db:
+                condition: service_healthy
+
+
 
 volumes:
     dev-db-data:

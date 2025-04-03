@@ -190,3 +190,5 @@ SIMPLE_JWT = {
     # The claim in the token that contains the user ID
     "USER_ID_CLAIM": "user_id",
 }
+
+pythonCopyCELERY_BROKER_URL = os.environ.get("CELERY_BROKER", "redis://redis:6379/0")

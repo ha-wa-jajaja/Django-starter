@@ -2,6 +2,7 @@ from django.db.models import Max, Min
 from django.shortcuts import get_object_or_404
 from rest_framework import generics
 from rest_framework.decorators import api_view
+from rest_framework.permissions import AllowAny, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -14,6 +15,16 @@ from .serializers import OrderSerializer, ProductSerializer, ProductsInfoSeriali
 class ProductListCreateAPIView(generics.ListCreateAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+
+    # NOTE: Customize the permission classes for this view
+    def get_permissions(self):
+        self.permission_classes = [AllowAny]
+        if self.request.method == "POST":
+            self.permission_classes = [IsAdminUser]
+
+        # This line triggers the parents get_permissions() method
+        # to apply the permission classes from its descendants
+        return super().get_permissions()
 
 
 @api_view(["GET"])

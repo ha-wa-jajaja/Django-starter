@@ -1,6 +1,6 @@
 from django.db.models import Max, Min
 from django.shortcuts import get_object_or_404
-from rest_framework import generics, filters
+from rest_framework import generics, filters, viewsets
 from rest_framework.decorators import api_view
 from rest_framework.permissions import AllowAny, IsAdminUser
 from rest_framework.response import Response
@@ -10,8 +10,8 @@ from rest_framework.pagination import PageNumberPagination, LimitOffsetPaginatio
 from django_filters.rest_framework import DjangoFilterBackend
 
 from .models import Order, Product
-from .serializers import OrderSerializer, ProductSerializer, ProductsInfoSerializer
-from .filters import ProductFilter, InStockFilterBackend
+from .serializers import (OrderSerializer, ProductSerializer, ProductsInfoSerializer, OrderCreateSerializer)
+from .filters import ProductFilter, InStockFilterBackend, OrderFilter
 
 
 # NOTE: DRF provides set of custom generic views to handle common tasks
@@ -54,6 +54,7 @@ class ProductListCreateAPIView(generics.ListCreateAPIView):
         return super().get_permissions()
 
 
+# NOTE: Django also allows to use function-based views
 @api_view(["GET"])
 def product_detail(request, pk):
     product = get_object_or_404(Product, pk=pk)
@@ -61,12 +62,27 @@ def product_detail(request, pk):
     return Response(serializer.data)
 
 
-# NOTE: Django also allows to use function-based views
-@api_view(["GET"])
-def order_list(request):
-    orders = Order.objects.all()
-    serializer = OrderSerializer(orders, many=True)
-    return Response(serializer.data)
+class OrderViewSet(viewsets.ModelViewSet):
+    queryset = Order.objects.prefetch_related('items__product')
+    serializer_class = OrderSerializer
+    pagination_class = None
+    filterset_class = OrderFilter
+    filter_backends = [DjangoFilterBackend]
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+    def get_serializer_class(self):
+        # can also check if POST: if self.request.method == 'POST'
+        if self.action == 'create' or self.action == 'update':
+            return OrderCreateSerializer
+        return super().get_serializer_class()
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        if not self.request.user.is_staff:
+            qs = qs.filter(user=self.request.user)
+        return qs
 
 
 # NOTE:

@@ -1,13 +1,16 @@
 from django.db.models import Max, Min
 from django.shortcuts import get_object_or_404
-from rest_framework import generics
+from rest_framework import generics, filters
 from rest_framework.decorators import api_view
 from rest_framework.permissions import AllowAny, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from django_filters.rest_framework import DjangoFilterBackend
+
 from .models import Order, Product
 from .serializers import OrderSerializer, ProductSerializer, ProductsInfoSerializer
+from .filters import ProductFilter
 
 
 # NOTE: DRF provides set of custom generic views to handle common tasks
@@ -15,6 +18,16 @@ from .serializers import OrderSerializer, ProductSerializer, ProductsInfoSeriali
 class ProductListCreateAPIView(generics.ListCreateAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    filterset_class = ProductFilter
+
+    filter_backends = [
+        # Note: Must also add this to ensure proper doc, even already applied ProductSerializer
+        DjangoFilterBackend,
+        filters.SearchFilter,
+        filters.OrderingFilter,
+    ]
+    search_fields = ['=name', 'description']
+    ordering_fields = ['name', 'price', 'stock']
 
     # NOTE: Customize the permission classes for this view
     def get_permissions(self):

@@ -167,6 +167,26 @@ REST_FRAMEWORK = {
     # NOTE: Globally apply pagination and default size
     # "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     # "PAGE_SIZE": 2,
+    # NOTE: Throttling
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        # NOTE: UserRateThrottle enables the 'user' scope
+        # 'rest_framework.throttling.UserRateThrottle'
+        # NOTE: Apply burst and sustained
+        # 'app.throttle.BurstRateThrottle',
+        # 'app.throttle.SustainedRateThrottle'
+        # NOTE: Custom throttle class
+        # apply this line, or add the throttle_classes = [ScopedRateThrottle] in the view
+        # 'rest_framework.throttling.ScopedRateThrottle',
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "100/minute",
+        # 'user': '3/minute',
+        # 'burst':'10/minute',
+        # 'sustained':'15/hour'
+        # orders is defined in app/bugbytes/views.py -> OrderViewSet
+        "orders": "4/minute",
+    },
 }
 
 # Provides clearer documentation that accurately represents each endpoint

@@ -2,12 +2,14 @@ from django.db.models import Max, Min
 from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
+from django.views.decorators.vary import vary_on_headers
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, generics, viewsets
 from rest_framework.decorators import api_view
 from rest_framework.pagination import LimitOffsetPagination, PageNumberPagination
 from rest_framework.permissions import AllowAny, IsAdminUser
 from rest_framework.response import Response
+from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
 from .filters import InStockFilterBackend, OrderFilter, ProductFilter
@@ -51,6 +53,10 @@ class ProductListCreateAPIView(generics.ListCreateAPIView):
 
     # NOTE: CACHING: 60 * 15 is 15 minutes
     @method_decorator(cache_page(60 * 15, key_prefix="product_list"))
+    # NOTE: VARYING: This decorator is used to vary the cache based on the Authorization header
+    # This means that if the request has an Authorization header, the cache will be different
+    @method_decorator(vary_on_headers("Authorization"))
+    # Important: After this applied, we might need a more precise cache clear mechanism for each user, possible to update in signals.py
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
@@ -81,6 +87,8 @@ def product_detail(request, pk):
 
 
 class OrderViewSet(viewsets.ModelViewSet):
+    throttle_scope = "orders"
+    throttle_classes = [ScopedRateThrottle]
     queryset = Order.objects.prefetch_related("items__product")
     serializer_class = OrderSerializer
     pagination_class = None

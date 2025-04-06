@@ -20,6 +20,7 @@ from .serializers import (
     ProductSerializer,
     ProductsInfoSerializer,
 )
+from .tasks import send_order_confirmation_email
 
 
 # NOTE: DRF provides set of custom generic views to handle common tasks
@@ -96,7 +97,11 @@ class OrderViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        order = serializer.save(user=self.request.user)
+        # NOTE: A function with celery decorator @shared_task
+        # And .delay() is used to call the task asynchronously
+        # This will push the task to the queue
+        send_order_confirmation_email.delay(order.order_id, self.request.user.email)
 
     def get_serializer_class(self):
         # can also check if POST: if self.request.method == 'POST'

@@ -49,7 +49,7 @@ INSTALLED_APPS = [
     "tags",
     "ingredient",
     "bugbytes",
-    'django_filters',
+    "django_filters",
 ]
 
 MIDDLEWARE = [
@@ -89,7 +89,6 @@ TEMPLATES = [
             ],
         },
     },
-
 ]
 
 WSGI_APPLICATION = "app.wsgi.application"
@@ -164,11 +163,10 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.SessionAuthentication",
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
-    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+    "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
     # NOTE: Apply pagination and default size
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 2
-
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 2,
 }
 
 # Provides clearer documentation that accurately represents each endpoint
@@ -197,4 +195,14 @@ SIMPLE_JWT = {
     "USER_ID_FIELD": "id",
     # The claim in the token that contains the user ID
     "USER_ID_CLAIM": "user_id",
+}
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": f"redis://{os.environ.get('REDIS_HOST', '127.0.0.1')}:{os.environ.get('REDIS_PORT', '6379')}/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
+    }
 }

@@ -1,17 +1,23 @@
 from django.db.models import Max, Min
 from django.shortcuts import get_object_or_404
-from rest_framework import generics, filters, viewsets
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters, generics, viewsets
 from rest_framework.decorators import api_view
+from rest_framework.pagination import LimitOffsetPagination, PageNumberPagination
 from rest_framework.permissions import AllowAny, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.pagination import PageNumberPagination, LimitOffsetPagination
 
-from django_filters.rest_framework import DjangoFilterBackend
-
+from .filters import InStockFilterBackend, OrderFilter, ProductFilter
 from .models import Order, Product
-from .serializers import (OrderSerializer, ProductSerializer, ProductsInfoSerializer, OrderCreateSerializer)
-from .filters import ProductFilter, InStockFilterBackend, OrderFilter
+from .serializers import (
+    OrderCreateSerializer,
+    OrderSerializer,
+    ProductSerializer,
+    ProductsInfoSerializer,
+)
 
 
 # NOTE: DRF provides set of custom generic views to handle common tasks
@@ -21,16 +27,16 @@ class ProductListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = ProductSerializer
     filterset_class = ProductFilter
 
-    # NOTE: Allowing to request a specific number of records (limit) starting from a 
+    # NOTE: Allowing to request a specific number of records (limit) starting from a
     # particular position (offset) in the result set.
     # pagination_class = LimitOffsetPagination
 
     # NOTE: PageNumberPagination is the standard pagination we're used to
-    pagination_class = PageNumberPagination
-    pagination_class.page_size = 2
-    pagination_class.page_query_param = 'page'
-    pagination_class.page_size_query_param = 'size'
-    pagination_class.max_page_size = 4
+    # pagination_class = PageNumberPagination
+    # pagination_class.page_size = 2
+    # pagination_class.page_query_param = 'page'
+    # pagination_class.page_size_query_param = 'size'
+    # pagination_class.max_page_size = 4
 
     filter_backends = [
         # Note: Must also add this to ensure proper doc, even already applied ProductSerializer
@@ -38,10 +44,22 @@ class ProductListCreateAPIView(generics.ListCreateAPIView):
         filters.SearchFilter,
         filters.OrderingFilter,
         # NOTE: This will be directly applied
-        InStockFilterBackend
+        InStockFilterBackend,
     ]
-    search_fields = ['=name', 'description']
-    ordering_fields = ['name', 'price', 'stock']
+    search_fields = ["=name", "description"]
+    ordering_fields = ["name", "price", "stock"]
+
+    # NOTE: CACHING: 60 * 15 is 15 minutes
+    @method_decorator(cache_page(60 * 15, key_prefix="product_list"))
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
+    # NOTE: This method is for demo purpose: to show the cache actually works
+    def get_queryset(self):
+        import time
+
+        time.sleep(2)
+        return super().get_queryset()
 
     # NOTE: Customize the permission classes for this view
     def get_permissions(self):
@@ -63,7 +81,7 @@ def product_detail(request, pk):
 
 
 class OrderViewSet(viewsets.ModelViewSet):
-    queryset = Order.objects.prefetch_related('items__product')
+    queryset = Order.objects.prefetch_related("items__product")
     serializer_class = OrderSerializer
     pagination_class = None
     filterset_class = OrderFilter
@@ -74,7 +92,7 @@ class OrderViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         # can also check if POST: if self.request.method == 'POST'
-        if self.action == 'create' or self.action == 'update':
+        if self.action == "create" or self.action == "update":
             return OrderCreateSerializer
         return super().get_serializer_class()
 

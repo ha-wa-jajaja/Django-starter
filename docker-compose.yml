@@ -1,4 +1,3 @@
-version: "3.9"
 
 services:
     app:
@@ -19,6 +18,8 @@ services:
             - DB_NAME=demodb
             - DB_USER=demouser
             - DB_PASS=demopwd
+            - REDIS_HOST=redis
+            - REDIS_PORT=6379
         depends_on:
             db:
                 # NOTE:
@@ -26,6 +27,8 @@ services:
                 # Other possible condition values include:
                 # service_started (just wait for the container to start)
                 # service_completed_successfully (for services that are expected to exit)
+                condition: service_healthy
+            redis:
                 condition: service_healthy
 
     db:
@@ -44,6 +47,22 @@ services:
             timeout: 5s
             retries: 5
 
+    redis:
+        image: redis:7.0-alpine
+        ports:
+            - "6379:6379"
+        volumes:
+            - redis-data:/data
+        # NOTE: Command below tells redis to save the data every 60 seconds
+        # if at least 1 key has changed.
+        command: redis-server --save 60 1 --loglevel warning
+        healthcheck:
+            test: ["CMD", "redis-cli", "ping"]
+            interval: 5s
+            timeout: 3s
+            retries: 5
+
 volumes:
     dev-db-data:
     dev-static-data:
+    redis-data:

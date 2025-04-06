@@ -48,6 +48,8 @@ INSTALLED_APPS = [
     "recipe",
     "tags",
     "ingredient",
+    "bugbytes",
+    "django_filters",
 ]
 
 MIDDLEWARE = [
@@ -161,6 +163,30 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.SessionAuthentication",
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
+    "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
+    # NOTE: Globally apply pagination and default size
+    # "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    # "PAGE_SIZE": 2,
+    # NOTE: Throttling
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        # NOTE: UserRateThrottle enables the 'user' scope
+        # 'rest_framework.throttling.UserRateThrottle'
+        # NOTE: Apply burst and sustained
+        # 'app.throttle.BurstRateThrottle',
+        # 'app.throttle.SustainedRateThrottle'
+        # NOTE: Custom throttle class
+        # apply this line, or add the throttle_classes = [ScopedRateThrottle] in the view
+        # 'rest_framework.throttling.ScopedRateThrottle',
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "100/minute",
+        # 'user': '3/minute',
+        # 'burst':'10/minute',
+        # 'sustained':'15/hour'
+        # orders is defined in app/bugbytes/views.py -> OrderViewSet
+        "orders": "4/minute",
+    },
 }
 
 # Provides clearer documentation that accurately represents each endpoint
@@ -189,4 +215,14 @@ SIMPLE_JWT = {
     "USER_ID_FIELD": "id",
     # The claim in the token that contains the user ID
     "USER_ID_CLAIM": "user_id",
+}
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": f"redis://{os.environ.get('REDIS_HOST', '127.0.0.1')}:{os.environ.get('REDIS_PORT', '6379')}/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
+    }
 }

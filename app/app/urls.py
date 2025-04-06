@@ -41,6 +41,7 @@ urlpatterns = [
     path("api/recipe/", include("recipe.urls")),
     path("api/tags/", include("tags.urls")),
     path("api/ingredients/", include("ingredient.urls")),
+    path("api/bugbytes/", include("bugbytes.urls")),
 ]
 
 if settings.DEBUG:
